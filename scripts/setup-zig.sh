@@ -33,8 +33,14 @@ esac
 find_zig() {
   local candidates=(
     "$VENV_DIR/lib/python"*/site-packages/ziglang/zig
+    "$VENV_DIR/Lib/site-packages/ziglang/zig.exe"
+    "$VENV_DIR/lib/site-packages/ziglang/zig"
     "$VENV_DIR/bin/zig"
+    "$VENV_DIR/Scripts/zig.exe"
     "$TOOLS_DIR/zig/zig"
+    "$TOOLS_DIR/zig/zig.exe"
+    "$TOOLS_DIR/ziglang/zig"
+    "$TOOLS_DIR/ziglang/zig.exe"
   )
   for c in "${candidates[@]}"; do
     if [ -x "$c" ]; then
@@ -84,15 +90,26 @@ fi
 
 mkdir -p "$TOOLS_DIR"
 
+# The venv layout differs between POSIX and Windows, so locate the interpreter
+# by trying both rather than assuming `bin/python`.
+venv_python() {
+  if [ -x "$VENV_DIR/bin/python" ]; then printf '%s\n' "$VENV_DIR/bin/python"; return 0; fi
+  if [ -x "$VENV_DIR/Scripts/python.exe" ]; then printf '%s\n' "$VENV_DIR/Scripts/python.exe"; return 0; fi
+  if [ -x "$VENV_DIR/bin/python3" ]; then printf '%s\n' "$VENV_DIR/bin/python3"; return 0; fi
+  return 1
+}
+
 echo "Installing zig $ZIG_VERSION into $VENV_DIR ..."
 if "$PYTHON" -m venv "$VENV_DIR" >/dev/null 2>&1 \
-   && "$VENV_DIR/bin/python" -m pip install --quiet --disable-pip-version-check "ziglang==$ZIG_VERSION"; then
+   && VENV_PYTHON="$(venv_python)" \
+   && "$VENV_PYTHON" -m pip install --quiet --disable-pip-version-check "ziglang==$ZIG_VERSION"; then
   echo "Installed via the ziglang PyPI wheel."
 else
   echo "PyPI install failed; falling back to a direct tarball download..." >&2
   case "$(uname -s)" in
-    Linux)  PLATFORM="linux-x86_64" ;;
+    Linux)  PLATFORM="linux-$(uname -m)" ;;
     Darwin) PLATFORM="macos-$(uname -m)" ;;
+    MINGW* | MSYS* | CYGWIN*) PLATFORM="windows-x86_64" ;;
     *) echo "error: unsupported platform $(uname -s) for the tarball fallback" >&2; exit 1 ;;
   esac
   TARBALL="zig-$PLATFORM-$ZIG_VERSION.tar.xz"
