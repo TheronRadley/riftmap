@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  engine:
+    name: Zig engine
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # macOS is deliberately absent. Zig 0.13.0 cannot link its own build
+        # runner against the macOS 15 SDK shipped on the GitHub arm64 images:
+        # `zig build` fails with undefined `_getenv` / `_getcwd` / `_free` from
+        # libSystem before any Riftmap code is compiled. `macos-13` (Intel)
+        # would carry a compatible SDK, but that runner pool no longer starts.
+        # The engine is therefore verified on Linux and Windows, and macOS is
+        # documented as unverified rather than reported as passing.
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Zig 0.13.0
+        shell: bash
+        run: bash scripts/setup-zig.sh
+
+      - name: Build engine (ReleaseSafe)
+        shell: bash
+        run: bash scripts/build-engine.sh
+
+      - name: Engine unit tests
+        shell: bash
+        run: bash scripts/test-engine.sh
+
+      - name: Engine CLI smoke test
+        shell: bash
+        run: |
+          bash fixtures/scripts/make-fixtures.sh
+          ./engine/zig-out/bin/riftmap-engine --pretty fixtures/generated/tiny-js
+
+  typescript:
+    name: TypeScript
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # The Electron binary is not needed for builds or tests, and skipping it
+      # keeps CI fast and hermetic.
+      - name: Install dependencies
+        run: npm ci
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+
+      - name: Install Zig 0.13.0
+        run: bash scripts/setup-zig.sh
+
+      - name: Build engine
+        run: bash scripts/build-engine.sh
+
+      - name: Generate fixtures
+        run: bash fixtures/scripts/make-fixtures.sh
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Tests
+        run: npm test
+
+      - name: Build renderer and Electron bundles
+        working-directory: apps/desktop
+        run: npm run build
