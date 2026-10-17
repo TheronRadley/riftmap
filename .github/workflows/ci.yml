@@ -22,7 +22,18 @@ jobs:
 
       - name: Build engine (ReleaseSafe)
         shell: bash
-        run: bash scripts/build-engine.sh
+        run: |
+          set +e
+          bash scripts/build-engine.sh 2>&1 | tee "$RUNNER_TEMP/engine-build.log"
+          code=${PIPESTATUS[0]}
+          if [ "$code" -ne 0 ]; then
+            # Surface the tail of the compiler output as job annotations so the
+            # failure is readable without downloading the run log archive.
+            while IFS= read -r line; do
+              echo "::error file=engine::$line"
+            done < <(tail -n 30 "$RUNNER_TEMP/engine-build.log")
+            exit "$code"
+          fi
 
       - name: Engine unit tests
         shell: bash
