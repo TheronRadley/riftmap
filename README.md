@@ -337,6 +337,14 @@ platform does not expose it the column reads "not measured" instead of a guess.
   `tsc -b`, a production Vite build, and the browser preview (`npm run web`),
   which runs the identical pipeline against the same engine and Git.
 * **Packaging is configured but untested** on macOS and Windows targets.
+* **macOS builds of the engine are not verified in CI.** Zig 0.13.0 cannot link
+  its own build runner against the macOS 15 SDK on GitHub's arm64 images —
+  `zig build` fails with undefined `_getenv` / `_getcwd` / `_free` from
+  libSystem before any Riftmap code is compiled. The `macos-13` image carries a
+  compatible SDK but its runner pool no longer starts. CI therefore verifies the
+  engine on **Linux and Windows only** (both green); macOS is documented as
+  unverified rather than reported as passing. Building on a local Mac works
+  once a compatible SDK is selected.
 
 ## 14. What was actually run
 
@@ -395,6 +403,12 @@ $ node scripts/build-electron.mjs
 * Tailwind's `content` globs resolved against the process CWD rather than the
   package, producing an empty stylesheet when built from the repository root;
   now absolute.
+* `engine/build.zig.zon` listed `README.md` in `.paths` but the file did not
+  exist — an invalid package manifest. The engine README now exists.
+* CI: the Windows Zig bootstrap failed because the venv interpreter lives at
+  `Scripts/python.exe`, not `bin/python`; and the engine build failed on macOS
+  arm64 (see §13). Windows is fixed; macOS is documented as unverified.
+  `.gitattributes` now pins LF so the shell scripts survive a Windows checkout.
 
 ## 15. Roadmap / next improvements
 

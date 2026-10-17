@@ -12,9 +12,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Zig 0.13.0 cannot link its own build runner against the macOS 15 SDK
-        # used by `macos-latest` (arm64); `macos-13` carries a compatible SDK.
-        os: [ubuntu-latest, macos-13, windows-latest]
+        # macOS is deliberately absent. Zig 0.13.0 cannot link its own build
+        # runner against the macOS 15 SDK shipped on the GitHub arm64 images:
+        # `zig build` fails with undefined `_getenv` / `_getcwd` / `_free` from
+        # libSystem before any Riftmap code is compiled. `macos-13` (Intel)
+        # would carry a compatible SDK, but that runner pool no longer starts.
+        # The engine is therefore verified on Linux and Windows, and macOS is
+        # documented as unverified rather than reported as passing.
+        os: [ubuntu-latest, windows-latest]
     steps:
       - uses: actions/checkout@v4
 
@@ -24,25 +29,7 @@ jobs:
 
       - name: Build engine (ReleaseSafe)
         shell: bash
-        run: |
-          set +e
-          # Zig 0.13.0 predates the macOS 15 SDK layout. Without an explicit
-          # SDKROOT its own build runner fails to link against libSystem
-          # (undefined _getenv / _getcwd / _free / ...).
-          if [ "$(uname -s)" = "Darwin" ]; then
-            export SDKROOT="$(xcrun --sdk macosx --show-sdk-path)"
-            echo "SDKROOT=$SDKROOT"
-          fi
-          bash scripts/build-engine.sh 2>&1 | tee "$RUNNER_TEMP/engine-build.log"
-          code=${PIPESTATUS[0]}
-          if [ "$code" -ne 0 ]; then
-            # Surface the tail of the compiler output as job annotations so the
-            # failure is readable without downloading the run log archive.
-            while IFS= read -r line; do
-              echo "::error file=engine::$line"
-            done < <(tail -n 30 "$RUNNER_TEMP/engine-build.log")
-            exit "$code"
-          fi
+        run: bash scripts/build-engine.sh
 
       - name: Engine unit tests
         shell: bash
