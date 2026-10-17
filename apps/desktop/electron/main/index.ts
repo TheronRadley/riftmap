@@ -14,6 +14,7 @@
 
 import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
+import { existsSync } from 'node:fs';
 import { stat } from 'node:fs/promises';
 import { isAbsolute, join, normalize, relative, resolve } from 'node:path';
 import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
@@ -128,6 +129,11 @@ function createWindow(): BrowserWindow {
     show: false,
     title: 'Riftmap',
     autoHideMenuBar: true,
+    // Window/taskbar icon in development; packaged builds get their icon
+    // from electron-builder (`resources/icon.png`), so guard the dev path.
+    ...(existsSync(join(app.getAppPath(), 'resources', 'icon.png'))
+      ? { icon: join(app.getAppPath(), 'resources', 'icon.png') }
+      : {}),
     webPreferences: {
       preload: join(app.getAppPath(), 'out', 'preload', 'index.js'),
       contextIsolation: true,

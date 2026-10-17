@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.png" alt="Riftmap logo" width="160" />
+</p>
+
 # Riftmap
 
 **See where your codebase is under pressure.**
