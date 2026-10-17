@@ -1,0 +1,36 @@
+{
+  "name": "riftmap",
+  "version": "0.1.0",
+  "private": true,
+  "description": "See where your codebase is under pressure. Local-first repository analysis and visualization.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "zig:setup": "bash scripts/setup-zig.sh",
+    "engine:build": "npm run zig:setup -- --check && bash scripts/build-engine.sh",
+    "engine:build:debug": "bash scripts/build-engine.sh Debug",
+    "engine:test": "bash scripts/test-engine.sh",
+    "engine:bench": "bash benchmarks/run.sh",
+    "fixtures": "bash fixtures/scripts/make-fixtures.sh",
+    "dev": "npm run --workspace @riftmap/desktop dev",
+    "web": "npm run --workspace @riftmap/desktop dev:web",
+    "typecheck": "tsc -b packages/shared packages/git-analysis packages/analysis apps/desktop --pretty false",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "npm run engine:build && npm run --workspace @riftmap/desktop build",
+    "dist": "npm run build && npm run --workspace @riftmap/desktop dist",
+    "lint": "tsc -b packages/shared packages/git-analysis packages/analysis apps/desktop --pretty false"
+  },
+  "devDependencies": {
+    "@types/node": "20.16.11",
+    "typescript": "5.6.3",
+    "vitest": "2.1.5"
+  }
+}

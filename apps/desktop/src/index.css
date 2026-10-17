@@ -1,0 +1,138 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+}
+
+*:focus-visible {
+  outline: 2px solid #22d3ee;
+  outline-offset: 2px;
+}
+
+@layer components {
+  .panel {
+    @apply rounded-lg border border-graphite-700 bg-graphite-850;
+  }
+
+  .panel-header {
+    @apply flex items-center justify-between gap-3 border-b border-graphite-700 px-4 py-3;
+  }
+
+  .panel-title {
+    @apply text-sm font-semibold text-graphite-100;
+  }
+
+  .panel-note {
+    @apply text-2xs text-graphite-400;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-md border border-graphite-700
+      bg-graphite-750 px-3 py-1.5 text-xs font-medium text-graphite-200 transition-colors
+      hover:border-graphite-600 hover:bg-graphite-700 focus-visible:outline-none
+      disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-accent {
+    @apply border-accent-dim bg-accent-dim/30 text-accent-strong hover:border-accent hover:bg-accent-dim/50;
+  }
+
+  .btn-ghost {
+    @apply border-transparent bg-transparent text-graphite-300 hover:bg-graphite-800 hover:text-graphite-100;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full border border-graphite-700 bg-graphite-800
+      px-2 py-0.5 text-2xs text-graphite-300;
+  }
+
+  .input {
+    @apply w-full rounded-md border border-graphite-700 bg-graphite-900 px-2.5 py-1.5 text-xs
+      text-graphite-100 placeholder:text-graphite-500 focus:border-accent-dim focus:outline-none;
+  }
+
+  .label {
+    @apply text-2xs font-medium uppercase tracking-wide text-graphite-400;
+  }
+
+  .stat-value {
+    @apply text-2xl font-semibold tabular-nums text-graphite-100;
+  }
+
+  .stat-label {
+    @apply text-2xs uppercase tracking-wide text-graphite-400;
+  }
+
+  .th {
+    @apply sticky top-0 z-10 select-none border-b border-graphite-700 bg-graphite-850 px-3 py-2
+      text-left text-2xs font-semibold uppercase tracking-wide text-graphite-400;
+  }
+
+  .td {
+    @apply whitespace-nowrap border-b border-graphite-800 px-3 py-1.5 text-xs text-graphite-200;
+  }
+
+  .muted {
+    @apply text-graphite-400;
+  }
+
+  .num {
+    @apply tabular-nums;
+  }
+}
+
+/* Thin, unobtrusive scrollbars that match the graphite palette. */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a313a;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3a4350;
+  background-clip: content-box;
+}
+
+/* Skeleton shimmer for loading states. */
+@keyframes riftmap-shimmer {
+  0% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0.45;
+  }
+}
+.skeleton {
+  animation: riftmap-shimmer 1.4s ease-in-out infinite;
+  background-color: #22282f;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}

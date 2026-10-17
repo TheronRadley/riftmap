@@ -147,3 +147,31 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# ---------------------------------------------------------------------------
+# Riftmap
+# ---------------------------------------------------------------------------
+
+# Local toolchain (Zig compiler installed by scripts/setup-zig.sh)
+.tools/
+
+# Native engine build output
+engine/zig-out/
+engine/zig-cache/
+engine/.zig-cache/
+*.zig-cache
+
+# Electron / Vite build output
+apps/desktop/dist/
+apps/desktop/out/
+apps/desktop/release/
+apps/desktop/.vite/
+
+# Generated fixture git repositories (created by fixtures/scripts/make-fixtures.sh)
+fixtures/generated/
+
+# Benchmark scratch data
+benchmarks/.work/
+
+# TypeScript incremental build info produced by `tsc -b`
+*.tsbuildinfo

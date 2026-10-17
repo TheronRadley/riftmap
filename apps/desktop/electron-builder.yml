@@ -1,0 +1,26 @@
+appId: dev.riftmap.desktop
+productName: Riftmap
+copyright: Copyright (c) Riftmap contributors
+licenseFile: ../../LICENSE
+directories:
+  output: release
+  buildResources: resources
+files:
+  - out/**/*
+  - package.json
+  - ../../engine/zig-out/bin/riftmap-engine*
+extraResources:
+  - from: ../../engine/zig-out/bin/
+    to: engine
+    filter:
+      - riftmap-engine*
+mac:
+  target: dmg
+  category: public.app-category.developer-tools
+  darkModeSupport: true
+linux:
+  target: AppImage
+  category: Development
+win:
+  target: nsis
+  artifactName: ${productName}-${version}-setup.${ext}
