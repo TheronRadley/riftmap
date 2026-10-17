@@ -24,6 +24,13 @@ jobs:
         shell: bash
         run: |
           set +e
+          # Zig 0.13.0 predates the macOS 15 SDK layout. Without an explicit
+          # SDKROOT its own build runner fails to link against libSystem
+          # (undefined _getenv / _getcwd / _free / ...).
+          if [ "$(uname -s)" = "Darwin" ]; then
+            export SDKROOT="$(xcrun --sdk macosx --show-sdk-path)"
+            echo "SDKROOT=$SDKROOT"
+          fi
           bash scripts/build-engine.sh 2>&1 | tee "$RUNNER_TEMP/engine-build.log"
           code=${PIPESTATUS[0]}
           if [ "$code" -ne 0 ]; then
