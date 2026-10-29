@@ -1,10 +1,10 @@
 <p align="center">
-  <img src="assets/logo.png" alt="Riftmap logo" width="160" />
+  <img src="assets/logo.png" alt="Riftmap" width="480" />
 </p>
 
-# Riftmap
-
-**See where your codebase is under pressure.**
+<p align="center">
+  <strong>See where your codebase is under pressure.</strong>
+</p>
 
 Riftmap is a local-first desktop app that reads a local Git repository and shows
 its structure, complexity, dependencies, change activity and maintenance
